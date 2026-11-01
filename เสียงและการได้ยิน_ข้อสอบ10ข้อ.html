@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เสียงและการได้ยิน | แบบทดสอบวิทยาศาสตร์ ป.6</title>
+<style>
+:root{--navy:#183153;--blue:#2878b9;--pale:#eef6fc;--ink:#243247;--green:#21865b;--red:#c74646}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(135deg,#eaf4fb,#f8f5ff);font-family:Tahoma,"Noto Sans Thai",sans-serif;color:var(--ink);line-height:1.65}
+.wrap{max-width:850px;margin:28px auto;padding:18px}
+.card{background:#fff;border-radius:20px;padding:26px;box-shadow:0 10px 30px #18315318}
+h1{margin:0;color:var(--navy);font-size:clamp(24px,4vw,34px)}
+.sub{color:#64748b;margin:4px 0 18px}
+.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+.pill{background:var(--pale);color:var(--blue);padding:6px 12px;border-radius:99px;font-weight:bold;font-size:14px}
+.track{height:10px;background:#e7edf3;border-radius:99px;overflow:hidden;margin:18px 0 22px}
+.bar{height:100%;width:0;background:linear-gradient(90deg,#2878b9,#55b6a4);transition:width .25s}
+.question{font-size:19px;font-weight:bold;margin:8px 0 16px}
+.options{display:grid;gap:10px}
+.option{display:flex;gap:10px;align-items:flex-start;border:1.5px solid #dce5ee;border-radius:12px;padding:12px 14px;cursor:pointer;transition:.15s}
+.option:hover{border-color:var(--blue);background:#f7fbff}
+.option input{margin-top:6px;accent-color:var(--blue);transform:scale(1.15)}
+.option.selected{border-color:var(--blue);background:#eef6fc}
+.feedback{display:none;margin-top:16px;padding:14px;border-radius:12px}
+.feedback.good{display:block;background:#eaf7f0;border-left:5px solid var(--green)}
+.feedback.bad{display:block;background:#fff0f0;border-left:5px solid var(--red)}
+.controls{display:flex;justify-content:space-between;gap:10px;margin-top:22px;flex-wrap:wrap}
+button{border:0;border-radius:11px;padding:11px 20px;font-size:16px;font-weight:bold;cursor:pointer}
+.primary{background:var(--blue);color:white}.secondary{background:#e8eef5;color:var(--navy)}button:disabled{opacity:.45;cursor:not-allowed}
+.result{text-align:center;padding:20px 0}.score{font-size:48px;font-weight:bold;color:var(--blue)}
+.small{font-size:14px;color:#64748b}
+.review{margin-top:18px;text-align:left}.review-item{padding:12px;border-bottom:1px solid #e6edf3}
+@media(max-width:560px){.wrap{padding:10px;margin:10px auto}.card{padding:18px}.question{font-size:17px}}
+</style>
+</head>
+<body>
+<div class="wrap"><main class="card">
+<div class="top"><div><h1>🔊 เสียงและการได้ยิน</h1><div class="sub">แบบทดสอบวิทยาศาสตร์ ชั้นประถมศึกษาปีที่ 6</div></div><span class="pill">10 ข้อ · 10 คะแนน</span></div>
+<div class="track"><div class="bar" id="bar"></div></div>
+<div class="top small"><span id="progress">ข้อ 1 จาก 10</span><span id="answered">ตอบแล้ว 0/10 ข้อ</span></div>
+<section id="quiz">
+<div class="question" id="question"></div>
+<div class="options" id="options"></div>
+<div class="feedback" id="feedback" aria-live="polite"></div>
+<div class="controls"><button class="secondary" id="prev">ย้อนกลับ</button><button class="primary" id="next">ตรวจคำตอบ</button></div>
+</section>
+<section class="result" id="result" hidden></section>
+</main></div>
+<script>
+const questions = [
+{q:"1. เสียงเกิดขึ้นได้อย่างไร",o:["เกิดจากวัตถุมีสีสัน","เกิดจากการสั่นสะเทือนของวัตถุ","เกิดจากวัตถุมีอุณหภูมิสูง","เกิดจากแสงสะท้อน"],a:1,e:"เสียงเกิดจากการสั่นสะเทือนของแหล่งกำเนิดเสียง เช่น เส้นเสียงของคน สายกีตาร์ หรือเยื่อกลอง"},
+{q:"2. เพราะเหตุใดเราจึงไม่ได้ยินเสียงระฆังที่กำลังสั่น เมื่ออยู่ในสุญญากาศ",o:["ระฆังสั่นเร็วเกินไป","เสียงเดินทางได้เฉพาะในน้ำ","ไม่มีตัวกลางให้เสียงเดินทาง","สุญญากาศดูดกลืนเสียงทั้งหมด"],a:2,e:"เสียงต้องอาศัยตัวกลาง เช่น อากาศ น้ำ หรือของแข็ง ในการส่งผ่านการสั่นสะเทือน จึงเดินทางผ่านสุญญากาศไม่ได้"},
+{q:"3. โดยทั่วไปเสียงเดินทางผ่านตัวกลางชนิดใดได้เร็วที่สุด",o:["อากาศ","น้ำ","เหล็ก","เสียงเดินทางเร็วเท่ากันทุกตัวกลาง"],a:2,e:"โดยทั่วไปเสียงเดินทางในของแข็งได้เร็วกว่าของเหลวและแก๊ส เพราะอนุภาคอยู่ใกล้กันและถ่ายทอดการสั่นสะเทือนได้ดี"},
+{q:"4. เมื่อดีดสายกีตาร์แล้วเสียงดังขึ้น หากดีดแรงขึ้น สิ่งใดเปลี่ยนแปลงเด่นชัดที่สุด",o:["ความถี่เพิ่มขึ้นเสมอ","แอมพลิจูดของการสั่นเพิ่มขึ้น","เสียงเดินทางช้าลง","ความยาวคลื่นเป็นศูนย์"],a:1,e:"การดีดแรงขึ้นทำให้สายสั่นด้วยแอมพลิจูดมากขึ้น จึงได้ยินเสียงดังขึ้น ส่วนความถี่สัมพันธ์กับระดับเสียงสูงต่ำ"},
+{q:"5. เสียงแหลมกับเสียงทุ้มแตกต่างกันเนื่องจากสมบัติใดของคลื่นเสียง",o:["ความถี่","แอมพลิจูด","ระยะทางจากผู้ฟัง","ชนิดของหูฟัง"],a:0,e:"เสียงแหลมมีความถี่สูง ส่วนเสียงทุ้มมีความถี่ต่ำ"},
+{q:"6. นักเรียนตะโกนใส่หน้าผาห่างออกไป แล้วได้ยินเสียงสะท้อนกลับมา ปรากฏการณ์นี้เรียกว่าอะไร",o:["การหักเหของเสียง","การสะท้อนของเสียง","การดูดกลืนเสียง","การสั่นพ้องของแสง"],a:1,e:"เสียงสะท้อนเกิดจากคลื่นเสียงกระทบสิ่งกีดขวางแล้วสะท้อนกลับมายังผู้ฟัง"},
+{q:"7. ส่วนใดของหูทำหน้าที่รับคลื่นเสียงและส่งผ่านไปยังช่องหู",o:["ใบหู","คอเคลีย","ประสาทรับเสียง","ท่อยูสเตเชียน"],a:0,e:"ใบหูช่วยรวบรวมคลื่นเสียงเข้าสู่ช่องหู จากนั้นคลื่นเสียงจะทำให้แก้วหูสั่น"},
+{q:"8. เมื่อคลื่นเสียงผ่านช่องหูไปถึงแก้วหู จะเกิดอะไรขึ้นเป็นลำดับแรก",o:["แก้วหูสั่น","สมองสร้างเสียงขึ้นทันที","กระดูกแขนสั่น","คอเคลียหยุดทำงาน"],a:0,e:"คลื่นเสียงทำให้แก้วหูสั่น แล้วการสั่นจะส่งต่อผ่านกระดูกหูไปยังหูชั้นใน"},
+{q:"9. การฟังเสียงดังมากเป็นเวลานานอาจส่งผลอย่างไร",o:["ทำให้ได้ยินเสียงชัดขึ้นถาวร","ทำให้แก้วหูหนาขึ้นเสมอ","ทำลายเซลล์รับเสียงและทำให้การได้ยินเสื่อม","ไม่มีผลต่อหู"],a:2,e:"เสียงดังเป็นเวลานานอาจทำลายเซลล์ขนรับเสียงในคอเคลีย ทำให้เกิดการสูญเสียการได้ยินได้"},
+{q:"10. หากต้องใช้เครื่องตัดหญ้าที่มีเสียงดัง ควรปฏิบัติอย่างไรเพื่อป้องกันอันตรายต่อการได้ยิน",o:["เร่งเสียงเครื่องให้ดังขึ้น","ใช้ที่อุดหูหรือครอบหูลดเสียง และจำกัดเวลาสัมผัสเสียง","ถอดอุปกรณ์ป้องกันเพื่อฟังเสียงชัด","ยืนใกล้เครื่องให้มากที่สุด"],a:1,e:"ควรใช้อุปกรณ์ป้องกันการได้ยินที่เหมาะสม เพิ่มระยะห่างจากแหล่งเสียง และลดเวลาที่สัมผัสเสียงดัง"}
+];
+let index=0, answers=Array(questions.length).fill(null), checked=Array(questions.length).fill(false);
+const $=id=>document.getElementById(id);
+function render(){
+ const item=questions[index]; $("question").textContent=item.q;
+ $("options").innerHTML="";
+ item.o.forEach((v,i)=>{
+  const label=document.createElement("label"); label.className="option"+(answers[index]===i?" selected":"");
+  label.innerHTML=`<input type="radio" name="answer" value="${i}" ${answers[index]===i?"checked":""}><span>${"กขคง"[i]}. ${v}</span>`;
+  label.querySelector("input").addEventListener("change",()=>{answers[index]=i;render();});
+  $("options").appendChild(label);
+ });
+ $("progress").textContent=`ข้อ ${index+1} จาก ${questions.length}`;
+ $("answered").textContent=`ตอบแล้ว ${answers.filter(x=>x!==null).length}/${questions.length} ข้อ`;
+ $("bar").style.width=`${(index+1)/questions.length*100}%`;
+ $("prev").disabled=index===0;
+ $("next").textContent=checked[index]?(index===questions.length-1?"ดูผลคะแนน":"ข้อต่อไป"):"ตรวจคำตอบ";
+ const f=$("feedback"); f.className="feedback"; f.style.display="none";
+ if(checked[index]){
+  const correct=answers[index]===item.a; f.className="feedback "+(correct?"good":"bad");
+  f.innerHTML=`<strong>${correct?"✓ ถูกต้อง!":"✗ ยังไม่ถูกต้อง"}</strong><br>คำตอบที่ถูก: ${"กขคง"[item.a]}. ${item.o[item.a]}<br>${item.e}`;
+  f.style.display="block";
+ }
+}
+$("prev").onclick=()=>{if(index>0){index--;render();}};
+$("next").onclick=()=>{
+ if(!checked[index]){
+  if(answers[index]===null){alert("กรุณาเลือกคำตอบก่อนครับ");return;}
+  checked[index]=true;render();return;
+ }
+ if(index<questions.length-1){index++;render();}else showResult();
+};
+function showResult(){
+ const score=questions.reduce((s,q,i)=>s+(answers[i]===q.a?1:0),0);
+ $("quiz").hidden=true;$("result").hidden=false;
+ let msg=score>=8?"ยอดเยี่ยม! เข้าใจเรื่องเสียงและการได้ยินได้ดี":score>=5?"ทำได้ดีแล้ว ลองทบทวนคำอธิบายอีกครั้ง":"ค่อย ๆ ทบทวน แล้วลองทำใหม่อีกครั้งนะ";
+ $("result").innerHTML=`<div class="small">ผลการทำแบบทดสอบ</div><div class="score">${score}/10</div><h2>${msg}</h2><p>ตอบถูก ${score} ข้อ จากทั้งหมด 10 ข้อ</p><button class="primary" id="retry">ทำแบบทดสอบอีกครั้ง</button><div class="review"><h3>เฉลยและทบทวน</h3>${questions.map((q,i)=>`<div class="review-item"><strong>${i+1}. ${"กขคง"[q.a]}. ${q.o[q.a]}</strong><br><span class="small">${q.e}</span></div>`).join("")}</div>`;
+ $("retry").onclick=()=>{index=0;answers=Array(10).fill(null);checked=Array(10).fill(false);$("quiz").hidden=false;$("result").hidden=true;render();};
+}
+render();
+</script>
+</body></html>
